@@ -3,7 +3,6 @@
 
 # File : automate_cellulaire.py
 # Created by and Sebastiao Clement the 03/02/2020
-
 """
 """
 
