@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # File : automate_cellulaire.py
-# Created by Anthony Giraudo the 03/02/2020
+# Created by Anthony Giraudo and Sebastiao Clement the 03/02/2020
 
 """
 """
