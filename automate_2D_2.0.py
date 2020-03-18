@@ -54,8 +54,7 @@ def etape(grille):
     """
     :param grille: array, espace de l'automate cellulaire
     """
-    
-    
+
     old_grille = np.array(grille, copy=True)
     
     """
@@ -137,15 +136,18 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    
+    """
     n = 100
     grille = np.zeros((n, n))
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
+    """
+
+    grille = np.array([[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]])
 
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=100, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=3000, fargs=(grille, plot), repeat=False)
     plt.show()
