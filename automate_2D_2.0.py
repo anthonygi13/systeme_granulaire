@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # File : automate_2D.py
-# Created by Anthony Giraudo and Clement Sebastiao the 05/02/2020
+# Created by Anthony Giraudo and Clement Sebastiao theee 05/02/2020
 
 """
 Ce code permet de creer un automate cellulaire simulant la chute de grains de sable (voir le README.txt).
