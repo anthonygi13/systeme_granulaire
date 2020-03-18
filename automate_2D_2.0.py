@@ -138,9 +138,10 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    """
+    
     n = 100
     grille = np.zeros((n, n))
+    """
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
@@ -157,7 +158,17 @@ if __name__ == "__main__":
 
     grille[-len(taille)*2 - 10, pos] = 1
 
+    
+    for i in range(19,80):
+        grille[i+20,i]=2
+        grille[i+20,99-i]=2
+    for k in range(25,70):
+        for j in range(19,50):
+            grille[j-19,k+2]=np.random.binomial(1, 0.5)
+    grille[69:71,49:51]=0
+    grille[69:71,48]=2
+    grille[69:71,51]=2
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=200, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=100, fargs=(grille, plot), repeat=False)
     plt.show()
