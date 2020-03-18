@@ -10,8 +10,6 @@ Notre systeme est represente dans un array de valeur, le vide est represente par
 les surfaces par 2, et les bords agissent comme des surfaces.
 """
 
-# FIXME: bug de l acide
-
 # Modules
 
 import numpy as np
@@ -51,7 +49,6 @@ def get_sommets(grille):
 
 "Fonction actualisant notre automate cellulaire d'un pas de temps."
 def etape(grille):
-    print("grille", grille)
     """
     :param grille: array, espace de l'automate cellulaire
     """
@@ -106,7 +103,6 @@ def etape(grille):
     """
     On applique nos masques complets a notre grille pour l'actualiser.
     """
-    print("1bis", grille)
     grille[masque_droite + masque_gauche] = 0
     grille[1:,:][(masque_droite + masque_gauche)[:-1, :]] = 0
 
@@ -120,20 +116,14 @@ def etape(grille):
     grille[2:, :-1][(masque_droite_gauche * np.logical_not(rand))[:-2, 1:]] = 1
 
     # pas random
-    print("grille2", grille)
     grille[1:, 1:][masque_droite_pas_gauche[:-1, :-1]] = 1
-    print("3", grille)
     grille[2:, 1:][masque_droite_pas_gauche[:-2, :-1]] = 1
-    print("4", grille)
     grille[1:, :-1][masque_gauche_pas_droite[:-1, 1:]] = 1
-    print("5", grille)
     grille[2:, :-1][masque_gauche_pas_droite[:-2, 1:]] = 1
-    print("6", grille)
-
-
 
 
 "Fonction qui repete en boucle l'etape de notre automate cellulaire."
+
 def animate(i, grille, plot):
     """
     :param i: integer, nombre de fois que l'on repete l'etape
@@ -148,6 +138,7 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
+    """
     n = 100
     grille = np.zeros((n, n))
     grille[:49, 0] = 1
@@ -155,8 +146,17 @@ if __name__ == "__main__":
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
     """
-    grille = np.array([[0, 1, 0, 0], [0, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0]])
-    """
+
+    n = 100
+    grille = np.zeros((n, n))
+    pos = 50
+    taille = [i for i in range(15, 0, -2)]
+    grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
+    for i in range(1, len(taille)):
+        grille[-i*2-2:-i*2, pos-taille[i]//2:pos+taille[i]//2+1] = 1
+
+    grille[-len(taille)*2 - 10, pos] = 1
+
     fig = plt.figure()
     plot = plt.imshow(grille)
     anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=200, fargs=(grille, plot), repeat=False)
