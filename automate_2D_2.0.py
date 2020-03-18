@@ -141,24 +141,25 @@ if __name__ == "__main__":
     
     n = 100
     grille = np.zeros((n, n))
+    
     """
+    #pente
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
     """
 
-    n = 100
-    grille = np.zeros((n, n))
     pos = 50
     taille = [i for i in range(15, 0, -2)]
     grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
     for i in range(1, len(taille)):
         grille[-i*2-2:-i*2, pos-taille[i]//2:pos+taille[i]//2+1] = 1
 
-    grille[-len(taille)*2 - 10, pos] = 1
+    grille[-len(taille)*2 - 5, pos+5] = 1
 
-    
+    """
+    #sablier
     for i in range(19,80):
         grille[i+20,i]=2
         grille[i+20,99-i]=2
@@ -168,6 +169,9 @@ if __name__ == "__main__":
     grille[69:71,49:51]=0
     grille[69:71,48]=2
     grille[69:71,51]=2
+    """
+    
+    
     fig = plt.figure()
     plot = plt.imshow(grille)
     anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=100, fargs=(grille, plot), repeat=False)
