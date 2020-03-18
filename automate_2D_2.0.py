@@ -4,6 +4,8 @@
 # File : automate_2D.py
 # Created by Anthony Giraudo and Clement Sebastiao theee 05/02/2020
 
+# FIXME: faire tomber seulement colonnes avec 2 grains de sable, pas 1 grain et 1 bord...
+
 """
 Ce code permet de creer un automate cellulaire simulant la chute de grains de sable (voir le README.txt).
 Notre systeme est represente dans un array de valeur, le vide est represente par 0, les grains par 1, 
@@ -130,6 +132,7 @@ def animate(i, grille, plot):
     :param grille: array, espace de notre automate cellulaire
     :param plot: plot de notre automate cellulaire
     """
+
     etape(grille)
     plot.set_array(grille)
     return plot,
@@ -138,28 +141,30 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    
+    """
     n = 100
     grille = np.zeros((n, n))
     
     """
-    #pente
+    """
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
     """
 
+    """
     pos = 50
     taille = [i for i in range(15, 0, -2)]
     grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
     for i in range(1, len(taille)):
         grille[-i*2-2:-i*2, pos-taille[i]//2:pos+taille[i]//2+1] = 1
 
-    grille[-len(taille)*2 - 5, pos+5] = 1
+    grille[-len(taille)*2 - 10, pos+4] = 1
+    """
 
     """
-    #sablier
+    np.random.seed(234567)
     for i in range(19,80):
         grille[i+20,i]=2
         grille[i+20,99-i]=2
@@ -170,9 +175,10 @@ if __name__ == "__main__":
     grille[69:71,48]=2
     grille[69:71,51]=2
     """
-    
-    
+
+    grille = np.array([[0, 1, 1, 1], [1, 0, 1, 2], [0, 1, 2, 0], [0, 2, 0, 0], [0, 2, 0, 0]])
+
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=100, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=3000, fargs=(grille, plot), repeat=False)
     plt.show()
