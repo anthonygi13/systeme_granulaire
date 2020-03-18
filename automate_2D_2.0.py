@@ -51,6 +51,7 @@ def get_sommets(grille):
 
 "Fonction actualisant notre automate cellulaire d'un pas de temps."
 def etape(grille):
+    print("grille", grille)
     """
     :param grille: array, espace de l'automate cellulaire
     """
@@ -105,21 +106,32 @@ def etape(grille):
     """
     On applique nos masques complets a notre grille pour l'actualiser.
     """
+    print("1bis", grille)
     grille[masque_droite + masque_gauche] = 0
     grille[1:,:][(masque_droite + masque_gauche)[:-1, :]] = 0
 
+    # random
     rand = np.random.binomial(1, 0.5, old_grille.shape).astype(bool)
-    #gere les chutes a droite
+    # gere les chutes a droite
     grille[1:, 1:][(masque_droite_gauche * rand)[:-1, :-1]] = 1
     grille[2:, 1:][(masque_droite_gauche * rand)[:-2, :-1]] = 1
-    #gere les chutes a gauche
+    # gere les chutes a gauche
     grille[1:, :-1][(masque_droite_gauche * np.logical_not(rand))[:-1, 1:]] = 1
     grille[2:, :-1][(masque_droite_gauche * np.logical_not(rand))[:-2, 1:]] = 1
-    
+
+    # pas random
+    print("grille2", grille)
     grille[1:, 1:][masque_droite_pas_gauche[:-1, :-1]] = 1
+    print("3", grille)
     grille[2:, 1:][masque_droite_pas_gauche[:-2, :-1]] = 1
+    print("4", grille)
     grille[1:, :-1][masque_gauche_pas_droite[:-1, 1:]] = 1
-    grille[2:, :-1][masque_droite_pas_gauche[:-2, 1:]] = 1
+    print("5", grille)
+    grille[2:, :-1][masque_gauche_pas_droite[:-2, 1:]] = 1
+    print("6", grille)
+
+
+
 
 "Fonction qui repete en boucle l'etape de notre automate cellulaire."
 def animate(i, grille, plot):
@@ -136,7 +148,6 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    """
     n = 100
     grille = np.zeros((n, n))
     grille[:49, 0] = 1
@@ -144,10 +155,9 @@ if __name__ == "__main__":
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
     """
-
-    grille = np.array([[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]])
-
+    grille = np.array([[0, 1, 0, 0], [0, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0]])
+    """
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=3000, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=200, fargs=(grille, plot), repeat=False)
     plt.show()
