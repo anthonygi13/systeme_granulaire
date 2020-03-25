@@ -126,15 +126,54 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    
+    """
     n = 100
     grille = np.zeros((n, n))
+    """
+    """
+    #Ecoulement
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
     grille[80, 18:23] = 2
+    """
+
+    """
+    #Avalanche
+    pos = 50
+    taille = [i for i in range(15, 0, -2)]
+    grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
+    for i in range(1, len(taille)):
+        grille[-i*2-2:-i*2, pos-taille[i]//2:pos+taille[i]//2+1] = 1
+
+    grille[-len(taille)*2 - 10, pos+4] = 1
+    """
+    """
+    #Sablier
+    for i in range(19,80):
+        grille[i+20,i]=2
+        grille[i+20,99-i]=2
+    for k in range(25,70):
+        for j in range(19,50):
+            grille[j-19,k+2]=np.random.binomial(1, 0.5)
+    grille[69:71,49:51]=0
+    grille[69:71,48]=2
+    grille[69:71,51]=2
+    """
+    
+    #Galton
+    grille=np.zeros((150,100))
+    for i in range(25,50):
+        grille[i-25,i]=2
+        grille[i-25,100-i]=2
+        grille[i-25,i+1:100-i]=1
+    for i in range(0,20):
+        grille[79:,31+2*i]=2
+    for i in range(0,19):
+        for j in range(0,i):
+            grille[25+3*i,51-i+2*j]=2
 
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=100, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=40, fargs=(grille, plot), repeat=False)
     plt.show()

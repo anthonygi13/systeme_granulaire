@@ -142,12 +142,12 @@ def animate(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
-    """
+    
     n = 100
     grille = np.zeros((n, n))
     
     """
-    """
+    #Ecoulement
     grille[:49, 0] = 1
     for i in range(20):
         grille[50+i, i] = 2
@@ -155,6 +155,7 @@ if __name__ == "__main__":
     """
 
     """
+    #Avalanche
     pos = 50
     taille = [i for i in range(15, 0, -2)]
     grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
@@ -163,9 +164,8 @@ if __name__ == "__main__":
 
     grille[-len(taille)*2 - 10, pos+4] = 1
     """
-
     """
-    np.random.seed(234567)
+    #Sablier
     for i in range(19,80):
         grille[i+20,i]=2
         grille[i+20,99-i]=2
@@ -176,10 +176,9 @@ if __name__ == "__main__":
     grille[69:71,48]=2
     grille[69:71,51]=2
     """
-
-    grille = np.array([[0, 1, 1, 1], [1, 0, 1, 2], [0, 1, 2, 0], [0, 2, 0, 0], [0, 2, 0, 0]])
+    
 
     fig = plt.figure()
     plot = plt.imshow(grille)
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=3000, fargs=(grille, plot), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=500, interval=50, fargs=(grille, plot), repeat=False)
     plt.show()
