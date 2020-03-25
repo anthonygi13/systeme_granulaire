@@ -145,7 +145,7 @@ if __name__ == "__main__":
     
     n = 100
     grille = np.zeros((n, n))
-    
+
     """
     #Ecoulement
     grille[:49, 0] = 1

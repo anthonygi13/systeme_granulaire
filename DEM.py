@@ -141,7 +141,7 @@ def apply_force(grain1, grain2):
     dist = np.linalg.norm(grain2.pos - grain1.pos)
     delta = -dist + grain1.radius + grain2.radius
     normal = (grain2.pos - grain1.pos) / dist
-    if (delta > 0.):
+    if delta > 0.:
         f = normal * delta * stiffness
         grain1.force -= f
         grain2.force += f
@@ -171,7 +171,7 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
         grain.patch.center = (grain.pos[0], grain.pos[1])
 
     patch_list = [grain.patch for grain in boite.grains]
-    """"
+
     ########## debug
     a = np.zeros(boite.grille.shape, dtype=object)
     for x in range(boite.Nx):
@@ -182,31 +182,39 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
     print(a)
 
     ################
-    """
+
     return patch_list
 
 
 # Main
 
 if __name__ == "__main__":
-    max_iteration = 1000
+    max_iteration = 100
     n_skip_drawing = 1
 
-    r = 4  # TODO: faudra faire gaffe aux unites
+    size = (100, 100)
+    N = 3
+
+    r = np.amin(size)//N/2  # TODO: faudra faire gaffe aux unites
     m = 1  # TODO: faudra faire gaffe aux unites
 
     dt = 0.006
 
-    size = (100, 100)
-    Nx = int(np.around(size[0] / (r * 1.1)))  # TODO: a modifier eventuellement
-    Ny = int(np.around(size[1] / (r * 1.1)))  # TODO: a modifier eventuellement
+    Nx = int(np.around(size[0] / (r*2 * 1.1)))  # TODO: a modifier eventuellement
+    Ny = int(np.around(size[1] / (r*2 * 1.1)))  # TODO: a modifier eventuellement
+    print("boites", Nx, Ny)
 
     boite = Boite(size, Nx, Ny)
 
-    for x in range(10, 100, 10):
-        for y in range(10, 100, 10):
+    print(size[0]//N, r)
+
+    for x in range(size[0]//N, size[0] - size[0]//N, size[0]//N):
+        for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
             x_rand = x + np.random.normal()
+            if x == size[0]//N:
+                x_rand += 10
             y_rand = y + np.random.normal()
+            print(x, y)
             boite.add_grain(Grain([x_rand, y_rand], r, m))
 
     # init matplotlib figure
@@ -219,3 +227,44 @@ if __name__ == "__main__":
     anim = animation.FuncAnimation(fig, animate, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
     #plt.show()
     anim.save('test.mp4', metadata={'artist': 'Guido'})
+
+
+#FIXME: le code ci dessous produit une erreur (a cause des grains qui se touchent pile poile ?)
+"""
+if __name__ == "__main__":
+    max_iteration = 100
+    n_skip_drawing = 1
+
+    size = (100, 100)
+    N = 3
+
+    r = np.amin(size)//N/2  # TODO: faudra faire gaffe aux unites
+    m = 1  # TODO: faudra faire gaffe aux unites
+
+    dt = 0.006
+
+    Nx = int(np.around(size[0] / (r * 1.1)))  # TODO: a modifier eventuellement
+    Ny = int(np.around(size[1] / (r * 1.1)))  # TODO: a modifier eventuellement
+
+    boite = Boite(size, Nx, Ny)
+
+    print(size[0]//N, r)
+
+    for x in range(size[0]//N, size[0] - size[0]//N, size[0]//N):
+        for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
+            x_rand = x# + np.random.normal()
+            y_rand = y# + np.random.normal()
+            print(x, y)
+            boite.add_grain(Grain([x_rand, y_rand], r, m))
+
+    # init matplotlib figure
+    fig = plt.figure()
+    plt.xlim(0, size[0])
+    plt.ylim(0, size[1])
+    ax = plt.axes()
+    plt.gca().set_aspect('equal', adjustable='box')  # TODO: a capter
+
+    anim = animation.FuncAnimation(fig, animate, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
+    #plt.show()
+    anim.save('test.mp4', metadata={'artist': 'Guido'})
+"""
