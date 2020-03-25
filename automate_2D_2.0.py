@@ -42,6 +42,7 @@ def get_sommets(grille):
     """
     sommets = grille == 1
     sommets[1:, :] *= (grille[:-1, :] == 0)
+    sommets[:-1, :] *= grille[1:, :] != 2
     indices = np.argwhere(sommets)
     for indice in indices:
             i, j = indice[0], indice[1]
