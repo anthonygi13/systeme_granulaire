@@ -26,11 +26,11 @@ class Grain:
 
     def __init__(self, pos, radius, mass):
         self.radius = radius
-        self.pos = np.array(pos)
+        self.pos = np.array(pos, dtype=float)
         self.mass = mass
-        self.vel = np.zeros((2,))
-        self.acc = np.zeros((2,))
-        self.force = np.zeros((2,))
+        self.vel = np.zeros((2,), dtype=float)
+        self.acc = np.zeros((2,), dtype=float)
+        self.force = np.zeros((2,), dtype=float)
         self.id = Grain.__n
         Grain.__n += 1
 
@@ -52,23 +52,11 @@ class Boite:
                 self.grille[x, y] = []
 
     def add_grain(self, grain):
-        #TODO: checker aussi superposition avec d'autres grains ?
         if grain.pos[0] + grain.radius > self.size[0] or grain.pos[0] - grain.radius < 0:
             raise ValueError("Invalid x position for grain : {:.2f}".format(grain.pos[0]))
         if grain.pos[1] + grain.radius > self.size[1] or grain.pos[1] - grain.radius < 0:
             raise ValueError("Invalid y position for grain : {:.2f}".format(grain.pos[1]))
-        self.grains += [grain]  # TODO: utile sachant qu'on a deja tous les grains dans la grille ? pour l instant utile dans update_grille mais on peut le virer
-        cell_x, cell_y = int(grain.pos[0] / self.cell_size[0]), int(grain.pos[1] / self.cell_size[1])
-        """
-        print("GRAIIIIIIIIIINNNNNNNN")
-        print("pos grain", grain.pos)
-        print("coord cell", cell_x, cell_y)
-        print("cell size", self.cell_size)
-        print("Nx", self.Nx)
-        print("Ny", self.Ny)
-        print("pos cell", self.cell_size[0]*cell_x, self.cell_size[1]*cell_y)
-        """
-        self.grille[cell_x, cell_y] += [grain]
+        self.grains += [grain]
 
     def update_grille(self):
         self.init_grille()
@@ -76,24 +64,31 @@ class Boite:
             cell_x, cell_y = int(grain.pos[0] // self.cell_size[0]), int(grain.pos[1] // self.cell_size[1])
             self.grille[cell_x, cell_y] += [grain]
 
-    def contact(self):
-        for x in range(self.Nx):
-            for y in range(self.Ny):
-                cells = [(x, y), (x-1, y) if x-1>0 else (), (x-1, y-1) if x-1>0 and y-1>0 else (), (x, y-1) if y-1>0 else (), (x+1, y-1) if x+1 < self.Nx and y-1>0 else ()]
-                for grain1 in self.grille[x, y]:
-                    for cell_id, cell in enumerate(cells):
-                        if cell_id == 0:
-                            for grain2 in self.grille[cell[0], cell[1]]:
-                                if grain1.id > grain2.id:
-                                    apply_force(grain1, grain2)
-                        elif cell:
-                            for grain2 in self.grille[cell[0], cell[1]]:
-                                apply_force(grain1, grain2)
-
     def apply_gravity(self):
         # WARNING: reset all forces
         for grain in self.grains:
             grain.force = np.array([0., -g() * grain.mass])
+
+    def contact(self):
+        for x in range(self.Nx):
+            for y in range(self.Ny):
+                cells = [(x, y), (x-1, y) if x-1>=0 else (), (x-1, y-1) if x-1>=0 and y-1>=0 else (), (x, y-1) if y-1>=0 else (), (x+1, y-1) if x+1 < self.Nx and y-1>=0 else ()]
+                print("CURRENT CELL", x, y)
+                for grain1 in self.grille[x, y]:
+                    print("CURRENT GRAIN", grain1.id)
+                    for cell_id, cell in enumerate(cells):
+                        if cell: print("cell", cell[0], cell[1])
+                        if cell_id == 0:
+                            for grain2 in self.grille[cell[0], cell[1]]:
+                                print("grain trouve", grain2.id)
+                                if grain1.id > grain2.id:
+                                    print("contact", grain1.id, grain2.id)
+                                    apply_force(grain1, grain2)
+                        elif cell:
+                            for grain2 in self.grille[cell[0], cell[1]]:
+                                print("grain trouve", grain2.id)
+                                print("contact", grain1.id, grain2.id)
+                                apply_force(grain1, grain2)
 
     def movement(self, dt):
         # apply velocity verlet scheme
@@ -127,10 +122,10 @@ class Boite:
                     grain.vel[1] *= -.9
 
     def loop_function(self, dt):
+        self.update_grille()
         self.apply_gravity()
         self.contact()
         self.movement(dt)
-        self.update_grille()
 
 
 def apply_force(grain1, grain2):
@@ -156,7 +151,12 @@ def apply_force(grain1, grain2):
 def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
     print('computing iteration', i*n_skip_drawing, '/', max_iteration)
 
-    for k in range(n_skip_drawing):
+    ########debug
+    for grain in boite.grains:
+        print("vel", grain.vel)
+    ###########
+
+    for k in range(n_skip_drawing + 1):
         boite.loop_function(dt)
 
     iteration = i * n_skip_drawing # TODO: a arranger, c un peu le bordel
@@ -173,14 +173,21 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
     patch_list = [grain.patch for grain in boite.grains]
 
     ########## debug
+    for x in range(boite.size[0]//boite.Nx, boite.size[0], boite.size[0]//boite.Nx):
+        plt.plot([x, x], [0, boite.size[1]])
+    for y in range(boite.size[1]//boite.Ny, boite.size[1], boite.size[1]//boite.Ny):
+        plt.plot([0, boite.size[0]], [y, y])
+
+    plt.xlabel("iteration={}".format(iteration))
+    """
     a = np.zeros(boite.grille.shape, dtype=object)
     for x in range(boite.Nx):
         for y in range(boite.Ny):
             a[x, y] = []
             for grain in boite.grille[x, y]:
                 a[x, y] += [grain.id]
-    print(a)
-
+    print(np.flip(a.T, axis=0))
+    """
     ################
 
     return patch_list
@@ -189,8 +196,8 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
 # Main
 
 if __name__ == "__main__":
-    max_iteration = 100
-    n_skip_drawing = 1
+    max_iteration = 200
+    n_skip_drawing = 1 # TODO: en vrai n_skip_drawing skip n-1 frame, pas clair à arranger
 
     size = (100, 100)
     N = 3
@@ -207,7 +214,6 @@ if __name__ == "__main__":
     boite = Boite(size, Nx, Ny)
 
     print(size[0]//N, r)
-
     for x in range(size[0]//N, size[0] - size[0]//N, size[0]//N):
         for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
             x_rand = x + np.random.normal()
@@ -221,50 +227,12 @@ if __name__ == "__main__":
     fig = plt.figure()
     plt.xlim(0, size[0])
     plt.ylim(0, size[1])
-    ax = plt.axes()
+    ax = plt.axes()  # TODO: a capter
     plt.gca().set_aspect('equal', adjustable='box')  # TODO: a capter
 
-    anim = animation.FuncAnimation(fig, animate, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
     #plt.show()
     anim.save('test.mp4', metadata={'artist': 'Guido'})
 
-
-#FIXME: le code ci dessous produit une erreur (a cause des grains qui se touchent pile poile ?)
-"""
-if __name__ == "__main__":
-    max_iteration = 100
-    n_skip_drawing = 1
-
-    size = (100, 100)
-    N = 3
-
-    r = np.amin(size)//N/2  # TODO: faudra faire gaffe aux unites
-    m = 1  # TODO: faudra faire gaffe aux unites
-
-    dt = 0.006
-
-    Nx = int(np.around(size[0] / (r * 1.1)))  # TODO: a modifier eventuellement
-    Ny = int(np.around(size[1] / (r * 1.1)))  # TODO: a modifier eventuellement
-
-    boite = Boite(size, Nx, Ny)
-
-    print(size[0]//N, r)
-
-    for x in range(size[0]//N, size[0] - size[0]//N, size[0]//N):
-        for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
-            x_rand = x# + np.random.normal()
-            y_rand = y# + np.random.normal()
-            print(x, y)
-            boite.add_grain(Grain([x_rand, y_rand], r, m))
-
-    # init matplotlib figure
-    fig = plt.figure()
-    plt.xlim(0, size[0])
-    plt.ylim(0, size[1])
-    ax = plt.axes()
-    plt.gca().set_aspect('equal', adjustable='box')  # TODO: a capter
-
-    anim = animation.FuncAnimation(fig, animate, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
-    #plt.show()
-    anim.save('test.mp4', metadata={'artist': 'Guido'})
-"""
+# TODO : qu'on puisse voir la premiere frame !
+# TODO : checker que les contacts se font qu'une fois a chaque fois entre 2 particules, je suis pas sur sur que c au point

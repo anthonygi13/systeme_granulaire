@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     grille[-len(taille)*2 - 10, pos+4] = 1
     """
-    """
+
     #Sablier
     for i in range(19,80):
         grille[i+20,i]=2
@@ -175,7 +175,6 @@ if __name__ == "__main__":
     grille[69:71,49:51]=0
     grille[69:71,48]=2
     grille[69:71,51]=2
-    """
     
 
     fig = plt.figure()
