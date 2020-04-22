@@ -138,7 +138,6 @@ def animate(i, grille, plot):
     plot.set_array(grille)
     return plot,
 
-
 # Main
 
 if __name__ == "__main__":
@@ -176,8 +175,21 @@ if __name__ == "__main__":
     grille[69:71,48]=2
     grille[69:71,51]=2
     
-
+    """
+    #Galton
+    grille=np.zeros((160,100))
+    for i in range(25,50):
+        grille[i-25,i]=2
+        grille[i-25,100-i]=2
+        grille[i-25,i+1:100-i]=1
+    for i in range(0,20):
+        grille[79:,31+2*i]=2
+    for i in range(0,19):
+        for j in range(0,i):
+            grille[25+3*i,51-i+2*j]=2
+    """
     fig = plt.figure()
-    plot = plt.imshow(grille)
+    plot = plt.imshow(grille,'afmhot')
+    plt.colorbar()
     anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=500, interval=50, fargs=(grille, plot), repeat=False)
     plt.show()

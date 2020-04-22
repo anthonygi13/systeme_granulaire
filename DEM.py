@@ -230,9 +230,9 @@ if __name__ == "__main__":
     ax = plt.axes()  # TODO: a capter
     plt.gca().set_aspect('equal', adjustable='box')  # TODO: a capter
 
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=max_iteration, interval=50, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
-    #plt.show()
-    anim.save('test.mp4', metadata={'artist': 'Guido'})
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=max_iteration, interval=dt*1000, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
+    plt.show()
+    #anim.save('test.mp4', metadata={'artist': 'Guido'})
 
 # TODO : qu'on puisse voir la premiere frame !
 # TODO : checker que les contacts se font qu'une fois a chaque fois entre 2 particules, je suis pas sur sur que c au point

@@ -162,7 +162,7 @@ if __name__ == "__main__":
     """
     
     #Galton
-    grille=np.zeros((150,100))
+    grille=np.zeros((160,100))
     for i in range(25,50):
         grille[i-25,i]=2
         grille[i-25,100-i]=2
@@ -174,6 +174,6 @@ if __name__ == "__main__":
             grille[25+3*i,51-i+2*j]=2
 
     fig = plt.figure()
-    plot = plt.imshow(grille)
+    plot = plt.imshow(grille,"afmhot")
     anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=1000, interval=40, fargs=(grille, plot), repeat=False)
     plt.show()
