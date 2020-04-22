@@ -73,21 +73,21 @@ class Boite:
         for x in range(self.Nx):
             for y in range(self.Ny):
                 cells = [(x, y), (x-1, y) if x-1>=0 else (), (x-1, y-1) if x-1>=0 and y-1>=0 else (), (x, y-1) if y-1>=0 else (), (x+1, y-1) if x+1 < self.Nx and y-1>=0 else ()]
-                print("CURRENT CELL", x, y)
+                #print("CURRENT CELL", x, y)
                 for grain1 in self.grille[x, y]:
-                    print("CURRENT GRAIN", grain1.id)
+                    #print("CURRENT GRAIN", grain1.id)
                     for cell_id, cell in enumerate(cells):
-                        if cell: print("cell", cell[0], cell[1])
+                        #if cell: print("cell", cell[0], cell[1])
                         if cell_id == 0:
                             for grain2 in self.grille[cell[0], cell[1]]:
-                                print("grain trouve", grain2.id)
+                                #print("grain trouve", grain2.id)
                                 if grain1.id > grain2.id:
-                                    print("contact", grain1.id, grain2.id)
+                                    #print("contact", grain1.id, grain2.id)
                                     apply_force(grain1, grain2)
                         elif cell:
                             for grain2 in self.grille[cell[0], cell[1]]:
-                                print("grain trouve", grain2.id)
-                                print("contact", grain1.id, grain2.id)
+                                #print("grain trouve", grain2.id)
+                                #print("contact", grain1.id, grain2.id)
                                 apply_force(grain1, grain2)
 
     def movement(self, dt):
@@ -147,32 +147,37 @@ def apply_force(grain1, grain2):
         grain1.force += F
         grain2.force -= F
 
-
 def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
-    print('computing iteration', i*n_skip_drawing, '/', max_iteration)
+    print('computing iteration', i*(n_skip_drawing+1), '/', max_iteration)
 
+    """
     ########debug
     for grain in boite.grains:
         print("vel", grain.vel)
     ###########
+    """
+    if i != 0:
+        for k in range(n_skip_drawing + 1):
+            boite.loop_function(dt)
 
-    for k in range(n_skip_drawing + 1):
-        boite.loop_function(dt)
-
-    iteration = i * n_skip_drawing # TODO: a arranger, c un peu le bordel
+    iteration = i * (n_skip_drawing+1) # TODO: a arranger, c un peu le bordel
     if iteration >= max_iteration:
         sys.exit(0)
 
+
     # TODO: a capter !!
     for grain in boite.grains:
-        if hasattr(grain, 'patch') is False:
+        if hasattr(grain, 'patch') is False: # TODO: pas besoin peut etre avec le init
             grain.patch = plt.Circle((grain.pos[0], grain.pos[1]), grain.radius)
             ax.add_patch(grain.patch)
         grain.patch.center = (grain.pos[0], grain.pos[1])
 
     patch_list = [grain.patch for grain in boite.grains]
 
+    plt.xlabel("iteration={}".format(iteration))
+
     ########## debug
+    """
     for x in range(boite.size[0]//boite.Nx, boite.size[0], boite.size[0]//boite.Nx):
         plt.plot([x, x], [0, boite.size[1]])
     for y in range(boite.size[1]//boite.Ny, boite.size[1], boite.size[1]//boite.Ny):
@@ -180,11 +185,14 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
 
     plt.xlabel("iteration={}".format(iteration))
     """
+    """
     a = np.zeros(boite.grille.shape, dtype=object)
     for x in range(boite.Nx):
         for y in range(boite.Ny):
             a[x, y] = []
-            for grain in boite.grille[x, y]:
+            for grain in boite.grille[xA function used to draw a clear frame. If not given, the results of drawing from the first item in the frames sequence will be used. This function will be called once before the first frame.
+
+The required signature is:, y]:
                 a[x, y] += [grain.id]
     print(np.flip(a.T, axis=0))
     """
@@ -196,9 +204,25 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
 # Main
 
 if __name__ == "__main__":
-    max_iteration = 200
-    n_skip_drawing = 1 # TODO: en vrai n_skip_drawing skip n-1 frame, pas clair à arranger
+    max_iteration = 1000
+    n_skip_drawing = 0
 
+    size = (1000, 1000)
+    r = 4
+    m = 1
+    dt = 0.006
+    Nx = int(np.around(size[0] / (r * 2 * 1.1)))  # TODO: a modifier eventuellement
+    Ny = int(np.around(size[1] / (r * 2 * 1.1)))  # TODO: a modifier eventuellement
+    boite = Boite(size, Nx, Ny)
+
+    for x in range(10, 1000, 10):
+        for y in range(10, 1000, 10):
+            x_rand = x + np.random.normal()
+            y_rand = y + np.random.normal()
+            r_rand = 4
+            boite.add_grain(Grain((x_rand, y_rand), r, m))
+
+    """
     size = (100, 100)
     N = 3
 
@@ -218,10 +242,14 @@ if __name__ == "__main__":
         for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
             x_rand = x + np.random.normal()
             if x == size[0]//N:
-                x_rand += 10
+                #x_rand += 10
+                pass
             y_rand = y + np.random.normal()
             print(x, y)
             boite.add_grain(Grain([x_rand, y_rand], r, m))
+    """
+
+
 
     # init matplotlib figure
     fig = plt.figure()
@@ -234,5 +262,5 @@ if __name__ == "__main__":
     plt.show()
     #anim.save('test.mp4', metadata={'artist': 'Guido'})
 
-# TODO : qu'on puisse voir la premiere frame !
+# TODO : echelles de temps
 # TODO : checker que les contacts se font qu'une fois a chaque fois entre 2 particules, je suis pas sur sur que c au point

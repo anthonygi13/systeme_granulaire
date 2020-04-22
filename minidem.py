@@ -22,8 +22,8 @@ def init():
 
     # init matplotlib figure
     fig = plt.figure()
-    plt.xlim(0, 100)
-    plt.ylim(0, 100)
+    plt.xlim(0, 1000)
+    plt.ylim(0, 1000)
     ax = plt.axes()
     plt.gca().set_aspect('equal', adjustable='box')
 
@@ -32,7 +32,7 @@ def animate(i):
     global max_iteration, iteration
     print('computing iteration', iteration, '/', max_iteration)
 
-    for i in range(5):
+    for i in range(1):
         loop_function()
         iteration += 1
 
