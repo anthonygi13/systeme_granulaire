@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# File : automate_2D.py
-# Created by Anthony Giraudo and Clement Sebastiao theee 05/02/2020
+# File : automate_2D_commande.py
+# Created by Anthony Giraudo and Clement Sebastiao the 05/02/2020
 
-# FIXME: faire tomber seulement colonnes avec 2 grains de sable, pas 1 grain et 1 bord...
+
 
 """
 Ce code permet de creer un automate cellulaire simulant la chute de grains de sable (voir le README.txt).
@@ -73,8 +73,6 @@ def etape1(grille):
     On met en place les differents masques nous renseignant sur la condition de notre grain
     au sommet, d'abord pour savoir si il a un voisin a gauche, droite, en bas a droite ou en bas a gauche. 
     """
-    #sommets = old_grille.shape[0] - np.argmin(np.flip(old_grille, axis=0), axis=0)
-    # x = np.indices(old_grille.shape)[0]
     sommets = get_sommets1(old_grille)
     pas_voisin_droite = np.zeros(old_grille.shape, dtype=bool)
     pas_voisin_droite[:, :-1] = old_grille[:, 1:] == 0
@@ -245,11 +243,21 @@ def animate2(i, grille, plot):
 # Main
 
 if __name__ == "__main__":
+    """
+    On cree un parser qui va prendre des arguments optionnels afin
+    de pouvoir ameliorer l'utilisation du programme par un 
+    utilisateur, pouvant modifier la version utilisee ou la structure
+    affichee.
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version","--v",help="Choose the used version of the cellular automaton", type=int, choices=[1,2])
-    parser.add_argument("--structure","--s",help="Choose the displayed structure in the cellular automaton", choices=["flow","f","avalanche","a","hourglass","h","galton","g"])
+    parser.add_argument("--version","-v",help="Choose the used version of the cellular automaton", type=int, choices=[1,2])
+    parser.add_argument("--structure","-s",help="Choose the displayed structure in the cellular automaton", choices=["flow","f","avalanche","a","hourglass","h","galton","g"])
     args = parser.parse_args()
     
+    """
+    On initialise notre grille et puis suivant l'argument entre on
+    la remplit d'une certaine structure.
+    """
     n = 100
     grille = np.zeros((n, n))
     if args.structure=="flow" or args.structure=="f":
@@ -270,7 +278,7 @@ if __name__ == "__main__":
             grille[i+20,i]=2
             grille[i+20,99-i]=2
         for k in range(25,70):
-            for j in range(19,50):
+            for j in range(19,40):
                 grille[j-19,k+2]=np.random.binomial(1, 0.5)
         grille[69:71,49:51]=0
         grille[69:71,48]=2
@@ -292,7 +300,7 @@ if __name__ == "__main__":
             grille[i+20,i]=2
             grille[i+20,99-i]=2
         for k in range(25,70):
-            for j in range(19,50):
+            for j in range(19,40):
                 grille[j-19,k+2]=np.random.binomial(1, 0.5)
         grille[69:71,49:51]=0
         grille[69:71,48]=2
@@ -302,56 +310,15 @@ if __name__ == "__main__":
     plot = plt.imshow(grille,'afmhot')
     plt.colorbar()
     
+    """
+    Suivant l'argument entre on utilise une certaine version, de 
+    notre automate cellulaire, puis on anime.
+    """
     if args.version==1:
-        anim = animation.FuncAnimation(fig, animate1, init_func=lambda: None, frames=500, interval=50, fargs=(grille, plot), repeat=False)
+        anim = animation.FuncAnimation(fig, animate1, init_func=lambda: None, frames=2000, interval=50, fargs=(grille, plot), repeat=False)
     elif args.version==2:
-        anim = animation.FuncAnimation(fig, animate2, init_func=lambda: None, frames=500, interval=50, fargs=(grille, plot), repeat=False)
+        anim = animation.FuncAnimation(fig, animate2, init_func=lambda: None, frames=2000, interval=50, fargs=(grille, plot), repeat=False)
     else:
-        print("No version specifid, version 1 used by default")
-        anim = animation.FuncAnimation(fig, animate1, init_func=lambda: None, frames=500, interval=50, fargs=(grille, plot), repeat=False)
+        print("No version specified, version 1 used by default")
+        anim = animation.FuncAnimation(fig, animate1, init_func=lambda: None, frames=2000, interval=50, fargs=(grille, plot), repeat=False)
     plt.show()
-        
-        
-    """
-    #Ecoulement
-    grille[:49, 0] = 1
-    for i in range(20):
-        grille[50+i, i] = 2
-    grille[80, 18:23] = 2
-    
-
-    
-    #Avalanche
-    pos = 50
-    taille = [i for i in range(15, 0, -2)]
-    grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
-    for i in range(1, len(taille)):
-        grille[-i*2-2:-i*2, pos-taille[i]//2:pos+taille[i]//2+1] = 1
-
-    grille[-len(taille)*2 - 10, pos+4] = 1
-    
-
-    #Sablier
-    for i in range(19,80):
-        grille[i+20,i]=2
-        grille[i+20,99-i]=2
-    for k in range(25,70):
-        for j in range(19,50):
-            grille[j-19,k+2]=np.random.binomial(1, 0.5)
-    grille[69:71,49:51]=0
-    grille[69:71,48]=2
-    grille[69:71,51]=2
-    
-    #Galton
-    grille=np.zeros((160,100))
-    for i in range(25,50):
-        grille[i-25,i]=2
-        grille[i-25,100-i]=2
-        grille[i-25,i+1:100-i]=1
-    for i in range(0,20):
-        grille[79:,31+2*i]=2
-    for i in range(0,19):
-        for j in range(0,i):
-            grille[25+3*i,51-i+2*j]=2
-    """
-
