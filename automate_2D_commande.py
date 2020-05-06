@@ -247,7 +247,7 @@ def animate2(i, grille, plot):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--v","--version",help="Choose the used version of the cellular automaton", type=int, choices=[1,2])
-    parser.add_argument("--s","--structure",help="Choose the displayed structure in the cellular automaton", type=int, choices=["flow","f","avalanche","a","hourglass","h","galton","g"])
+    parser.add_argument("--s","--structure",help="Choose the displayed structure in the cellular automaton", choices=["flow","f","avalanche","a","hourglass","h","galton","g"])
     args = parser.parse_args()
     
     n = 100

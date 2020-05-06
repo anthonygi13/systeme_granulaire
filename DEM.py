@@ -70,6 +70,7 @@ class Boite:
             grain.force = np.array([0., -g() * grain.mass])
 
     def contact(self):
+        print("\nNEW iteration\n")
         for x in range(self.Nx):
             for y in range(self.Ny):
                 cells = [(x, y), (x-1, y) if x-1>=0 else (), (x-1, y-1) if x-1>=0 and y-1>=0 else (), (x, y-1) if y-1>=0 else (), (x+1, y-1) if x+1 < self.Nx and y-1>=0 else ()]
@@ -87,18 +88,11 @@ class Boite:
                         elif cell:
                             for grain2 in self.grille[cell[0], cell[1]]:
                                 #print("grain trouve", grain2.id)
-                                #print("contact", grain1.id, grain2.id)
+                                print("contact", grain1.id, grain2.id)
                                 apply_force(grain1, grain2)
 
-    def movement(self, dt):
-        # apply velocity verlet scheme
-        for grain in self.grains:
-            a = grain.force / grain.mass
-            grain.vel += (grain.acc + a) * (dt / 2.)
-            grain.pos += grain.vel * dt + a * (dt ** 2.) / 2.
-            grain.acc = a
+    def normal_bc(self):
 
-        # apply boundary condition
         for grain in self.grains:
 
             if grain.pos[0] - grain.radius < 0:
@@ -121,11 +115,27 @@ class Boite:
                 if grain.vel[1] > 0.:
                     grain.vel[1] *= -.9
 
-    def loop_function(self, dt):
+    def sablier_bc(self):
+        self.normal_bc()
+        pass  # TODO
+
+    def movement(self, dt, boundary_conditions):
+
+        # apply velocity verlet scheme
+        for grain in self.grains:
+            a = grain.force / grain.mass
+            grain.vel += (grain.acc + a) * (dt / 2.)
+            grain.pos += grain.vel * dt + a * (dt ** 2.) / 2.
+            grain.acc = a
+
+        # boundary conditions
+        boundary_conditions(self)
+
+    def loop_function(self, dt, boundary_conditions):
         self.update_grille()
         self.apply_gravity()
         self.contact()
-        self.movement(dt)
+        self.movement(dt, boundary_conditions)
 
 
 def apply_force(grain1, grain2):
@@ -147,7 +157,8 @@ def apply_force(grain1, grain2):
         grain1.force += F
         grain2.force -= F
 
-def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
+
+def animate(i, ax, boite, dt, n_skip_drawing, max_iteration, boundary_conditions):
     print('computing iteration', i*(n_skip_drawing+1), '/', max_iteration)
 
     """
@@ -158,16 +169,15 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration):
     """
     if i != 0:
         for k in range(n_skip_drawing + 1):
-            boite.loop_function(dt)
+            boite.loop_function(dt, boundary_conditions)
 
-    iteration = i * (n_skip_drawing+1) # TODO: a arranger, c un peu le bordel
+    iteration = i * (n_skip_drawing + 1) # TODO: a arranger, c un peu le bordel
     if iteration >= max_iteration:
         sys.exit(0)
 
-
     # TODO: a capter !!
     for grain in boite.grains:
-        if hasattr(grain, 'patch') is False: # TODO: pas besoin peut etre avec le init
+        if hasattr(grain, 'patch') is False:
             grain.patch = plt.Circle((grain.pos[0], grain.pos[1]), grain.radius)
             ax.add_patch(grain.patch)
         grain.patch.center = (grain.pos[0], grain.pos[1])
@@ -204,10 +214,11 @@ The required signature is:, y]:
 # Main
 
 if __name__ == "__main__":
+    boundary_conditions = Boite.normal_bc
     max_iteration = 1000
-    n_skip_drawing = 0
+    n_skip_drawing = 5
+    size = (30, 30)
 
-    size = (1000, 1000)
     r = 4
     m = 1
     dt = 0.006
@@ -215,41 +226,12 @@ if __name__ == "__main__":
     Ny = int(np.around(size[1] / (r * 2 * 1.1)))  # TODO: a modifier eventuellement
     boite = Boite(size, Nx, Ny)
 
-    for x in range(10, 1000, 10):
-        for y in range(10, 1000, 10):
+    for x in range(10, size[0], 10):  # TODO: faire plus solide ?
+        for y in range(10, size[1], 10):
             x_rand = x + np.random.normal()
             y_rand = y + np.random.normal()
             r_rand = 4
             boite.add_grain(Grain((x_rand, y_rand), r, m))
-
-    """
-    size = (100, 100)
-    N = 3
-
-    r = np.amin(size)//N/2  # TODO: faudra faire gaffe aux unites
-    m = 1  # TODO: faudra faire gaffe aux unites
-
-    dt = 0.006
-
-    Nx = int(np.around(size[0] / (r*2 * 1.1)))  # TODO: a modifier eventuellement
-    Ny = int(np.around(size[1] / (r*2 * 1.1)))  # TODO: a modifier eventuellement
-    print("boites", Nx, Ny)
-
-    boite = Boite(size, Nx, Ny)
-
-    print(size[0]//N, r)
-    for x in range(size[0]//N, size[0] - size[0]//N, size[0]//N):
-        for y in range(size[1]//N, size[1] - size[1]//N, size[1]//N):
-            x_rand = x + np.random.normal()
-            if x == size[0]//N:
-                #x_rand += 10
-                pass
-            y_rand = y + np.random.normal()
-            print(x, y)
-            boite.add_grain(Grain([x_rand, y_rand], r, m))
-    """
-
-
 
     # init matplotlib figure
     fig = plt.figure()
@@ -258,9 +240,8 @@ if __name__ == "__main__":
     ax = plt.axes()  # TODO: a capter
     plt.gca().set_aspect('equal', adjustable='box')  # TODO: a capter
 
-    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=max_iteration, interval=dt*1000, fargs=(ax, boite, dt, n_skip_drawing, max_iteration), repeat=False)
-    plt.show()
-    #anim.save('test.mp4', metadata={'artist': 'Guido'})
+    anim = animation.FuncAnimation(fig, animate, init_func=lambda: None, frames=max_iteration, interval=dt*1000*(n_skip_drawing+1), fargs=(ax, boite, dt, n_skip_drawing, max_iteration, boundary_conditions), repeat=False)
+    #plt.show()
+    anim.save('test.mp4', metadata={'artist': 'Guido'})
 
-# TODO : echelles de temps
-# TODO : checker que les contacts se font qu'une fois a chaque fois entre 2 particules, je suis pas sur sur que c au point
+# TODO : echelles de temps et de distance
