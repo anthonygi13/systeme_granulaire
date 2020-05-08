@@ -96,11 +96,11 @@ dem.init()
 dem.loop_function = time_loop
 dem.max_iteration = 1000
 
-for x in range(10, 1000, 10):
-    for y in range(10, 1000, 10):
+for x in range(10, 100, 10):
+    for y in range(10, 100, 10):
         x_rand = x + random.random()
         y_rand = y + random.random()
-        r_rand = 4# + random.random()
+        r_rand = 4 + random.random()
         dem.grain_list.append(grain((x_rand, y_rand), r_rand, 1))
 
 dem.run()
