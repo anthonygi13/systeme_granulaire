@@ -18,7 +18,7 @@ import sys
 # Functions
 
 def g():
-    return 0.981 * 1000  # cm par s^2
+    return 9.81  # cm par s^2
 
 
 class Grain:
@@ -113,8 +113,11 @@ class Boite:
                 if grain.vel[1] > 0.:
                     grain.vel[1] *= -restitution_coeff
 
-    def sablier_bc(self):
+    def sablier_bc(self, H, h):
         self.normal_bc()
+
+
+
         pass  # TODO
 
     def movement(self, dt, boundary_conditions):
@@ -148,18 +151,10 @@ def apply_force(grain1, grain2):
     normal = (grain2.pos - grain1.pos) / dist
 
     if delta > 0.:
-        """
-        # hertz model for contact
-        E = 80e10  # young modulus, g.cm^-1.s^-2
-        mu = 0.22  # poisson ratio
-        f = 2*E/(3 * (1-mu**2)) * np.sqrt(1/(1/grain1.radius + 1/grain2.radius)) * delta**(3/2) * normal
-        grain1.force -= f
-        grain2.force += f
-        """
 
         # linear spring dashpot contact model
-        stiffness = 10000. * 1000  # g par seconde^2
-        damping = 14. * np.sqrt(1000)  # g par seconde
+        stiffness = 10000000.  # g par seconde^2
+        damping = 1400.  # g par seconde
         f = normal * delta * stiffness
         grain1.force -= f
         grain2.force += f
@@ -198,17 +193,19 @@ def animate(i, ax, boite, dt, n_skip_drawing, max_iteration, boundary_conditions
 
 if __name__ == "__main__":
     boundary_conditions = Boite.normal_bc
-    max_iteration = 20000
-    n_skip_drawing = 4
-    taille_boite = (20, 20)  # cm
+    max_iteration = 10000
+    n_skip_drawing = 99
+    taille_boite = (2, 2)  # cm
     N = 10
-    espacement = 0.03  # cm
-    r = 0.4  # cm
-    initial_pos = ((taille_boite[0] - N*(2*r+espacement)) / 2, (taille_boite[1] - N*(2*r+espacement)) / 2 - 5)
+    espacement = 0.003  # cm
+    r = 0.05  # cm
+    initial_pos = ((taille_boite[0] - N*(2*r+espacement)) / 2, (taille_boite[1] - N*(2*r+espacement)) / 2 - 0.4)
+    """
     density = 2700 * 1000 / 100**3  # g/cm^3
-    #m = 4/3 * np.pi * r**3 * density  # g
+    m = 4/3 * np.pi * r**3 * density  # g
+    """
     m = 10  # g
-    dt = 0.006 / np.sqrt(1000)  # s
+    dt = 0.0006  # s
 
     Nx = int(np.around(taille_boite[0] / (r * 2 * 1.1)))
     Ny = int(np.around(taille_boite[1] / (r * 2 * 1.1)))
@@ -232,3 +229,4 @@ if __name__ == "__main__":
     anim.save('test.mp4', metadata={'artist': 'Guido'})
 
 # TODO : sablier, et ajuster valeurs pour que ce soit pas mal, en fait poser equations pour retrouver comportement du code qu'on avait chope
+# TODO : comparaison temps entre quadrillage et pas quadrillage
