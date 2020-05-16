@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # File : automate_2D.py
-# Created by Anthony Giraudo and Clement Sebastiao theee 05/02/2020
+# Created by Anthony Giraudo and Clement Sebastiao the 05/02/2020
 
 # FIXME: faire tomber seulement colonnes avec 2 grains de sable, pas 1 grain et 1 bord...
 
