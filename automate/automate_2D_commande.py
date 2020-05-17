@@ -42,6 +42,7 @@ if __name__ == "__main__":
             grille[50 + i, i] = 2
             grille[80, 18:23] = 2
     elif args.structure == "avalanche" or args.structure == "a":
+        grille[0, 0] = 2  # bricolage pour l'affichage des bonnes couleurs
         pos = 50
         taille = [i for i in range(15, 0, -2)]
         grille[-2:, pos - taille[0] // 2:pos + taille[0] // 2 + 1] = 1
