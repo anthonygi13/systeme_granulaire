@@ -84,7 +84,8 @@ if __name__ == "__main__":
 
     fig = plt.figure()
     plot = plt.imshow(grille, 'afmhot')
-    plt.colorbar()
+    plt.axis('off')
+    
 
     #  Suivant l'argument entre on utilise une certaine version, de notre automate cellulaire, puis on anime.
     if args.version == 1:
